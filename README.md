@@ -164,8 +164,45 @@ pointer events, so off-screen copy is not announced or clickable.
 Requires WebP and canvas 2D — every current browser. Tested in Chromium at
 1440×900, 900×1200 and 390×844, plus the reduced-motion path.
 
-## Deploying to GitHub Pages
+## Deploying
 
-The repo is already Pages-ready: `.nojekyll` at the root stops Jekyll from
-stripping folders, and every asset path is relative, so it works from a project
-subpath. Point Pages at the branch root — no build step, no workflow needed.
+Every asset path is relative, so the site works from a domain root or a
+subpath without changes. There is no build step on either host.
+
+### Netlify (recommended)
+
+`netlify.toml` at the repo root configures the deploy: publish directory `.`,
+no build command, and long-lived immutable caching for `public/frames/*` so
+repeat visitors do not re-download 240 images.
+
+1. Sign in at <https://app.netlify.com> with GitHub.
+2. **Add new site** → **Import an existing project** → **GitHub**.
+3. Authorise Netlify and pick `dineshkarthi12/Construction-Website`.
+4. Leave the build settings alone — `netlify.toml` already sets them. Build
+   command must stay **empty** and publish directory **`.`**.
+5. **Deploy site.**
+
+Netlify assigns a random URL such as `random-name-123456.netlify.app`, which
+you can change under **Site configuration → Site details → Change site name**.
+Every push to `main` redeploys automatically.
+
+To deploy from the CLI instead:
+
+```bash
+npm install -g netlify-cli
+netlify login
+netlify deploy --prod
+```
+
+### GitHub Pages
+
+`.nojekyll` at the root stops Jekyll from stripping the `public/` and `js/`
+folders. Pages must be enabled first — it is off by default and the site 404s
+until it is switched on:
+
+**Settings → Pages → Source: Deploy from a branch → Branch: `main` / `(root)`
+→ Save.**
+
+A `pages build and deployment` run appears under the Actions tab once it is
+enabled; if no run appears, the setting did not save. The published URL is
+`https://<user>.github.io/Construction-Website/`.
