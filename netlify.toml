@@ -1,0 +1,46 @@
+# Netlify configuration
+#
+# The site is static with no build step: index.html, css/, js/ and
+# public/frames/ are served straight from the repo root exactly as they sit
+# in git. There is nothing to compile, so no build command is set.
+#
+# `sharp` in package.json is a one-off asset tool, not a runtime dependency.
+# Leaving the build command unset stops Netlify from installing it on deploy.
+
+[build]
+  publish = "."
+
+# The frame sets are the bulk of the payload (~24 MB across both). They only
+# change when scripts/optimize-frames.js is re-run, so cache them hard: a
+# repeat visitor should never re-download 240 images.
+#
+# NOTE: with `immutable`, a browser that has cached these will not re-fetch
+# for a year even if you regenerate the frames at a different quality. If you
+# re-run the optimizer and need viewers to see the change immediately, either
+# bump the folder name in FRAME_DIRS (js/main.js) or drop `immutable` here.
+[[headers]]
+  for = "/public/frames/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/css/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/js/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+# Always revalidate the entry point so a redeploy is picked up straight away.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
