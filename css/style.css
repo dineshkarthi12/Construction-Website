@@ -1,0 +1,491 @@
+/* ==========================================================================
+   From Ground Up — scroll-driven construction timelapse
+   Dark cinematic architectural styling. No frameworks, no build step.
+   ========================================================================== */
+
+:root {
+  --ink: #f4f6f8;
+  --ink-dim: rgba(244, 246, 248, 0.68);
+  --ink-faint: rgba(244, 246, 248, 0.42);
+  --bg: #0a0c10;
+  --accent: #f0a63c;          /* crane yellow / dusk window light */
+  --rule: rgba(244, 246, 248, 0.16);
+
+  --header-h: 4.5rem;
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --panel-max: 34rem;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   Frame canvas — pinned full-screen as the background layer
+   -------------------------------------------------------------------------- */
+
+#sequence {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--bg);
+}
+
+/* Gradient scrim over the canvas so white type stays legible on bright frames. */
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom,
+      rgba(6, 8, 12, 0.72) 0%,
+      rgba(6, 8, 12, 0.28) 26%,
+      rgba(6, 8, 12, 0.24) 58%,
+      rgba(6, 8, 12, 0.82) 100%),
+    radial-gradient(120% 85% at 50% 45%,
+      rgba(6, 8, 12, 0) 40%,
+      rgba(6, 8, 12, 0.5) 100%);
+}
+
+/* --------------------------------------------------------------------------
+   Scroll driver
+   -------------------------------------------------------------------------- */
+
+/* The only thing this element does is give the page its scrollable length. */
+.scroll-space {
+  position: relative;
+  z-index: 0;
+  height: 500vh;      /* desktop scroll length */
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
+   Progress bar + header
+   -------------------------------------------------------------------------- */
+
+.progress-track {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 40;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.progress-bar {
+  width: 0%;
+  height: 100%;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(240, 166, 60, 0.65);
+  will-change: width;
+}
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: var(--header-h);
+  padding: 0 var(--gutter);
+}
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* Logo mark: a small stacked-slab glyph, drawn in CSS. */
+.logo-mark {
+  position: relative;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: none;
+  border: 1.5px solid var(--accent);
+}
+
+.logo-mark::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0.4rem;
+  height: 0.4rem;
+  transform: translate(-50%, -50%);
+  background: var(--accent);
+}
+
+.logo-text {
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+}
+
+.logo-thin {
+  font-weight: 300;
+  color: var(--ink-dim);
+}
+
+.header-meta {
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* --------------------------------------------------------------------------
+   Loader
+   -------------------------------------------------------------------------- */
+
+.loader {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  transition: opacity 0.7s var(--ease), visibility 0.7s;
+}
+
+.loader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(20rem, 70vw);
+  text-align: center;
+}
+
+.loader-mark {
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1.5px solid var(--accent);
+  animation: mark-pulse 1.9s var(--ease) infinite;
+}
+
+@keyframes mark-pulse {
+  0%, 100% { opacity: 1; transform: rotate(0deg); }
+  50%      { opacity: 0.35; transform: rotate(45deg); }
+}
+
+.loader-label {
+  margin: 0.35rem 0 0;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.loader-percent {
+  margin: 0;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.loader-track {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.loader-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--accent);
+}
+
+/* --------------------------------------------------------------------------
+   Overlay panels
+   -------------------------------------------------------------------------- */
+
+.overlays {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 var(--gutter);
+  opacity: 0;                       /* JS drives this */
+  transform: translate3d(0, 1.5rem, 0);
+  will-change: opacity, transform;
+}
+
+/* Panels are inert until JS marks the active one, so links stay clickable
+   only while their panel is actually on screen. */
+.panel.is-active { pointer-events: auto; }
+
+.panel--hero,
+.panel--cta {
+  top: 50%;
+  align-items: center;
+  text-align: center;
+  transform: translate3d(0, calc(-50% + 1.5rem), 0);
+}
+
+.panel--left,
+.panel--right {
+  top: 50%;
+  align-items: flex-start;
+  text-align: left;
+  transform: translate3d(0, calc(-50% + 1.5rem), 0);
+}
+
+.panel--left  > * { margin-right: auto; }
+.panel--right > * { margin-left: auto; text-align: right; }
+.panel--right     { align-items: flex-end; }
+
+.panel--hero > *,
+.panel--cta  > * { max-width: min(var(--panel-max), 100%); }
+.panel--left > *,
+.panel--right > * { max-width: min(var(--panel-max), 100%); }
+
+/* --- type ---------------------------------------------------------------- */
+
+.eyebrow {
+  margin: 0 0 1rem;
+  font-size: clamp(0.65rem, 1.4vw, 0.72rem);
+  font-weight: 500;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.display {
+  margin: 0 0 1.1rem;
+  font-size: clamp(2.6rem, 9vw, 6rem);
+  font-weight: 300;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  text-shadow: 0 2px 40px rgba(0, 0, 0, 0.55);
+}
+
+.display--sm { font-size: clamp(2.2rem, 7vw, 4.4rem); }
+
+.heading {
+  margin: 0 0 1.1rem;
+  font-size: clamp(2rem, 6.5vw, 3.75rem);
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  text-shadow: 0 2px 34px rgba(0, 0, 0, 0.55);
+}
+
+.lede {
+  margin: 0;
+  font-size: clamp(0.98rem, 2.1vw, 1.2rem);
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  text-shadow: 0 1px 22px rgba(0, 0, 0, 0.6);
+}
+
+.body {
+  margin: 0;
+  padding-top: 1.35rem;
+  border-top: 1px solid var(--rule);
+  font-size: clamp(0.92rem, 1.8vw, 1.05rem);
+  font-weight: 300;
+  line-height: 1.72;
+  color: var(--ink-dim);
+  text-shadow: 0 1px 22px rgba(0, 0, 0, 0.6);
+}
+
+/* --- scroll cue ---------------------------------------------------------- */
+
+.scroll-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: clamp(2rem, 6vh, 3.5rem);
+}
+
+.scroll-cue-text {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.scroll-cue-line {
+  position: relative;
+  width: 1px;
+  height: 3.25rem;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.scroll-cue-line::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 45%;
+  background: var(--accent);
+  animation: cue-travel 2.1s var(--ease) infinite;
+}
+
+@keyframes cue-travel {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(230%); }
+}
+
+/* --- CTA + footer -------------------------------------------------------- */
+
+.button {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: 0.95rem 2.1rem;
+  border: 1px solid var(--accent);
+  color: var(--bg);
+  background: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.button:hover,
+.button:focus-visible {
+  background: transparent;
+  color: var(--accent);
+}
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-top: clamp(2.5rem, 8vh, 4.5rem);
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--rule);
+  width: min(var(--panel-max), 100%);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.dot {
+  width: 2px;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  .scroll-space { height: 350vh; }   /* shorter scroll length on small screens */
+
+  .panel--right { align-items: flex-start; }
+  .panel--right > * { margin-left: 0; margin-right: auto; text-align: left; }
+
+  .header-meta { display: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Reduced motion
+   The sequence is skipped entirely: main.js loads only the final frame and
+   paints it once as a static background, and every panel is shown at full
+   opacity in normal document flow.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-space { display: none; }
+
+  .loader { display: none; }
+
+  /* Nothing is being scrubbed, so the progress bar has nothing to report. */
+  .progress-track { display: none; }
+
+  .scrim { background: rgba(6, 8, 12, 0.78); }
+
+  .overlays {
+    position: relative;
+    inset: auto;
+    pointer-events: auto;
+  }
+
+  .panel,
+  .panel--hero,
+  .panel--cta,
+  .panel--left,
+  .panel--right {
+    position: relative;
+    top: auto;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    align-items: flex-start;
+    text-align: left;
+    min-height: auto;
+    padding-top: clamp(4rem, 12vh, 8rem);
+    padding-bottom: clamp(4rem, 12vh, 8rem);
+    max-width: 46rem;
+    margin: 0 auto;
+  }
+
+  .panel--hero { padding-top: calc(var(--header-h) + 4rem); }
+
+  .panel--right > * { margin-left: 0; margin-right: auto; text-align: left; }
+
+  .site-footer { justify-content: flex-start; margin-left: 0; }
+
+  .scroll-cue { display: none; }
+
+  .loader-mark,
+  .scroll-cue-line::after { animation: none; }
+}
