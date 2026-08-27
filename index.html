@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Ground Up — Construction Timelapse</title>
+<meta name="description" content="A scroll-driven timelapse: scroll forward to raise the building, scroll back to take it down.">
+<meta name="theme-color" content="#0a0c10">
+
+<!-- Inline SVG favicon: the same stacked-slab logo mark, no extra request. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0c10'/%3E%3Crect x='7' y='7' width='18' height='18' fill='none' stroke='%23f0a63c' stroke-width='2.5'/%3E%3Crect x='13.5' y='13.5' width='5' height='5' fill='%23f0a63c'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+
+<!-- Thin scroll-progress bar, fixed to the very top of the viewport. -->
+<div class="progress-track" aria-hidden="true">
+  <div class="progress-bar" id="progress-bar"></div>
+</div>
+
+<!-- Minimal fixed header with a logo mark. -->
+<header class="site-header">
+  <a class="logo" href="#hero">
+    <span class="logo-mark" aria-hidden="true"></span>
+    <span class="logo-text">ATLAS<span class="logo-thin">BUILD</span></span>
+  </a>
+  <span class="header-meta">Est. 1994 &middot; Commercial</span>
+</header>
+
+<!-- The frame sequence renders here, pinned behind everything else. -->
+<canvas id="sequence" aria-hidden="true"></canvas>
+
+<!-- Gradient scrim: keeps white type legible over bright daylight frames. -->
+<div class="scrim" aria-hidden="true"></div>
+
+<!-- Centered minimal loader with a live percentage. -->
+<div class="loader" id="loader">
+  <div class="loader-inner">
+    <div class="loader-mark" aria-hidden="true"></div>
+    <p class="loader-label">Preparing site</p>
+    <p class="loader-percent" id="loader-percent" role="status" aria-live="polite">0%</p>
+    <div class="loader-track" aria-hidden="true">
+      <div class="loader-fill" id="loader-fill"></div>
+    </div>
+  </div>
+</div>
+
+<!--
+  Overlay layer. Panels sit absolutely above the canvas and are faded in and
+  out purely with opacity + transform by js/main.js.
+
+  Each panel's id is matched against the CHECKPOINTS map in js/main.js, which
+  is the single source of truth for the scroll percentages. Change the timings
+  there; change the copy here. The percentages in the comments below are only
+  a reminder of the current values.
+-->
+<div class="overlays" id="overlays">
+
+  <!-- 0% – 10% -->
+  <section class="panel panel--hero" id="hero">
+    <p class="eyebrow">Atlas Build &middot; Project Meridian</p>
+    <h1 class="display">From Ground Up</h1>
+    <p class="lede">Two years of steel, concrete and daylight, compressed into a single scroll. Keep going to raise it &mdash; scroll back to take it down.</p>
+    <div class="scroll-cue" aria-hidden="true">
+      <span class="scroll-cue-text">Scroll</span>
+      <span class="scroll-cue-line"></span>
+    </div>
+  </section>
+
+  <!-- 20% – 35% -->
+  <section class="panel panel--left" id="foundation">
+    <p class="eyebrow">Phase 01</p>
+    <h2 class="heading">Foundation</h2>
+    <p class="body">Before anything rises, everything goes down. Forty thousand cubic metres of earth moved, the water table mapped and drained, then piled rafts driven to bedrock. The engineering that decides whether a building stands for fifty years or five is all finished before the first floor plate is poured.</p>
+  </section>
+
+  <!-- 45% – 60% -->
+  <section class="panel panel--right" id="structure">
+    <p class="eyebrow">Phase 02</p>
+    <h2 class="heading">Structure</h2>
+    <p class="body">The frame goes up on a seven-day floor cycle. Post-tensioned concrete cores climb ahead of the steel, the tower crane leapfrogs its own mast, and each slab is surveyed to millimetre tolerance before the next one lands on top of it. This is the fastest, loudest, most visible part of the build.</p>
+  </section>
+
+  <!-- 70% – 85% -->
+  <section class="panel panel--left" id="finish">
+    <p class="eyebrow">Phase 03</p>
+    <h2 class="heading">Finish</h2>
+    <p class="body">Once the envelope is sealed the work turns quiet and precise. Unitised glazing and stone rainscreen are hung panel by panel, services are commissioned floor by floor, and the interiors are fitted out behind the facade. The building stops being a site and starts being an address.</p>
+  </section>
+
+  <!-- 90% – 100% -->
+  <section class="panel panel--cta" id="cta">
+    <p class="eyebrow">Now handing over</p>
+    <h2 class="display display--sm">Ready to build yours?</h2>
+    <p class="lede">Tell us the site and the brief. We will tell you what it takes.</p>
+    <a class="button" href="mailto:hello@atlasbuild.example?subject=New%20project%20enquiry">Start a project</a>
+    <footer class="site-footer">
+      <span>&copy; 2026 Atlas Build</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span>Project Meridian</span>
+      <span class="dot" aria-hidden="true"></span>
+      <span>240 frames</span>
+    </footer>
+  </section>
+
+</div>
+
+<!--
+  Pure spacer. Its height is what the scroll sequence is mapped onto:
+  500vh on desktop, 350vh under 768px. Both values live in css/style.css.
+-->
+<div class="scroll-space" id="scroll-space" aria-hidden="true"></div>
+
+<script src="./js/main.js"></script>
+</body>
+</html>
